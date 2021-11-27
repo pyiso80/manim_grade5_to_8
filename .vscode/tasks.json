@@ -1,0 +1,39 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Render",
+			"type": "shell",
+			"command": "python -m manim ${file} ${input:Scene} ${input:opt}",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	],
+	"inputs": [
+		{
+			"id": "Scene",
+			"type": "command",
+			"command": "memento.promptString",
+			"args": {
+				"id": "Scene",
+				"description": "Enter Scene:",
+				"default": "",
+				"type": "promptString"
+			}
+		},
+		{
+            "id": "opt",
+            "type": "command",
+            "command": "memento.promptString",
+            "args": {
+                "id": "opt",
+                "description": "Render options",
+                "default": "-s",
+            }
+        }
+
+	],
+}
