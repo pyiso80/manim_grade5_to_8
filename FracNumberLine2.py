@@ -57,31 +57,36 @@ class FracNumberLine(Scene):
 
         #2/3 is the length of 2 such segments concatinated together
         #As long as the length is 2 parts of 1/3, it can be anywhere on the line
-        s1 = self.get_single_segment(0,2, frac_segs=fsegs, stroke_width=6, with_tips=False)
+        s1 = self.get_single_segment(fticks=fticks, start_at=0, num_of_segs=2, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s1, s1.get_left()), run_time=2)
-        s2 = self.get_single_segment(5,7, frac_segs=fsegs, stroke_width=6, with_tips=False)
+        s2 = self.get_single_segment(fticks=fticks, start_at=5, num_of_segs=2, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s2, s2.get_left()), run_time=2)
-        s3 = self.get_single_segment(13,15, frac_segs=fsegs, stroke_width=6, with_tips=False)
+        s3 = self.get_single_segment(fticks=fticks, start_at=13, num_of_segs=2, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s3, s3.get_left()), run_time=2)
         self.wait(5)
         self.play(FadeOut(s1,s2,s3))
 
-        s1a = self.get_single_segment(0,3, frac_segs=fsegs, stroke_width=6, with_tips=False)
+        s1a = self.get_single_segment(fticks=fticks, start_at=0, num_of_segs=3, stroke_width=6, with_tips=False)
+        s2a = self.get_single_segment(fticks=fticks, start_at=5, num_of_segs=3, stroke_width=6, with_tips=False)
+        s3a = self.get_single_segment(fticks=fticks, start_at=15, num_of_segs=3, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s1a, s1a.get_left()), run_time=2)
-        s2a = self.get_single_segment(5,8, frac_segs=fsegs, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s2a, s2a.get_left()), run_time=2)
-        s3a = self.get_single_segment(13,16, frac_segs=fsegs, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s3a, s3a.get_left()), run_time=2)
         self.wait(5)
         self.play(FadeOut(s1a, s2a, s3a))
 
-        s1b = self.get_single_segment(0,5, frac_segs=fsegs, stroke_width=6, with_tips=False)
+        s1b = self.get_single_segment(fticks=fticks, start_at=0, num_of_segs=5, stroke_width=6, with_tips=False)
+        s2b = self.get_single_segment(fticks=fticks, start_at=5, num_of_segs=5, stroke_width=6, with_tips=False, the_color=MY_RED)
+        s3b = self.get_single_segment(fticks=fticks, start_at=13, num_of_segs=5, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s1b, s1b.get_left()), run_time=2)
-        s2b = self.get_single_segment(6,11, frac_segs=fsegs, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s2b, s2b.get_left()), run_time=2)
-        s3b = self.get_single_segment(13,18, frac_segs=fsegs, stroke_width=6, with_tips=False)
         self.play(GrowFromPoint(s3b, s3b.get_left()), run_time=2)
         self.wait(5)
+
+        path1 = ArcBetweenPoints(start=s2b.get_center(), end=s1b.get_center()+UP*0.3)
+        path2 = ArcBetweenPoints(start=s3b.get_center(), end=s1b.get_center()+UP*0.6, radius=10)
+        self.play(MoveAlongPath(s2b, path1), run_time=3)
+        self.play(MoveAlongPath(s3b, path2), run_time=5)
 
 
     def create_frac_num_line(self,
@@ -104,13 +109,13 @@ class FracNumberLine(Scene):
 
         ticks_cnt = last_whole_num + 1
         long_ticks = [None]*ticks_cnt
-        for i in range(0, ticks_cnt, 1):
+        for i in range(0, len(long_ticks), 1):
             long_ticks[i] = f1.get_tick(i, size=0.2)
 
 
         ticks_cnt1 = last_whole_num * denominator + 1
         short_ticks = [None]*ticks_cnt1
-        for i in range(0, ticks_cnt1, 1):
+        for i in range(0, len(short_ticks), 1):
             short_ticks[i] = f1.get_tick(i/denominator)
         
         tip_seg = Line(f1.get_right(), f1.get_right() + [tip_set_len, 0, 0], color=color, stroke_width=f1.get_stroke_width())
@@ -130,18 +135,18 @@ class FracNumberLine(Scene):
         f2.align_to(f1, LEFT)
 
         lbl_nums = [None] * ticks_cnt
-        for i in range(0, ticks_cnt, 1):
+        for i in range(0, len(lbl_nums), 1):
             lbl_nums[i] = f1.get_number_mobject(i)
 
         frac_lbls = [None] * ticks_cnt1
-        for i in range(0, ticks_cnt1, 1):
+        for i in range(0, len(frac_lbls), 1):
             lbl = MathTex(f"\\frac{{{i}}}{{{denominator}}}")
             lbl.next_to(short_ticks[i], UP, buff=-0.1)
             lbl.font_size=frac_font_sz
             frac_lbls[i] = lbl
 
         frac_segs = [None]*(ticks_cnt1-1)
-        for i in range(0, ticks_cnt1-1, 1):
+        for i in range(0, len(frac_segs), 1):
             seg = Line(
                 f1.number_to_point(i/denominator), 
                 f1.number_to_point((i+1)/denominator), 
@@ -176,8 +181,8 @@ class FracNumberLine(Scene):
             vg.add(frac_segs[i])
         return vg
 
-    def get_single_segment(self, start_numerator, end_numerator, frac_segs, the_color=MY_MERCURY, stroke_width=3, with_tips=True, tip_color=RED):
-        seg = Line(frac_segs[start_numerator].get_left(), frac_segs[end_numerator-1].get_right(), stroke_width=stroke_width, color=MY_MERCURY)
+    def get_single_segment(self, fticks, start_at=0, num_of_segs=1, the_color=MY_MERCURY, stroke_width=3, with_tips=True, tip_color=RED):
+        seg = Line(fticks[start_at].get_center(), fticks[start_at + num_of_segs].get_center(), stroke_width=stroke_width, color=the_color)
         if with_tips:
             t1 = ArrowSquareFilledTip(color=tip_color, length=1/8)
             t1.rotate(45*DEGREES)
@@ -188,9 +193,15 @@ class FracNumberLine(Scene):
             return VGroup(seg, t1, t2)
         else:
             return VGroup(seg)
-
-    def get_brace(self, start_numerator, end_numerator, frac_segs):
-        return BraceBetweenPoints(frac_segs[start_numerator].get_left(), frac_segs[end_numerator].get_left(), direction=UP)
+    """
+    Parameters
+    ----------
+    start_at: Starting position of the brace. For the number line displaying multiples of 1/3, start_at=4 will start the
+    brace at position 4/3.
+    num_of_segs: the numerator of the fraction
+    """
+    def get_brace(self, fticks, start_at=0, num_of_segs=1):
+        return BraceBetweenPoints(fticks[start_at].get_center(), fticks[start_at + num_of_segs].get_center(), direction=UP)
 
 
 
