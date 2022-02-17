@@ -2,35 +2,36 @@ from manim import *
 
 config.background_color="#FFFBEF"
 BACKGROUND = "#FFFBEF"
-G_FIG_FILL_1 = "#33CCCC"
+G_FIG_FILL_1 = TEAL
 G_FIG_STROKE_1= "#5E5E5E" #Main
 G_FIG_STROKE_2= "#A9A9A9" #Dimmed
 IND_COLOR = "#FF2600"
 IND_LINE_W = 1.5
 TEX_COLOR1 = "#212121"
 
+
+
 class FracMulIntro1(Scene):
     left_alignment_point = Point().shift(LEFT*6)
     def construct(self):
         self.wait()
-
-        
-        
-        # self.play_mul(2,5,3,7)
-        # self.clear()
-        # self.play_mul("m", "n", "k", "l")
         self.play_mul_illu(2,3,5,7)
+        self.clear()
         self.play_mul_illu(3,5,4,3)
-        # f2dt= self.get_frac_illustration(14, 21, range(0,14), sec_per_group=3)
-        # self.add(*f2dt.get("parts"), *f2dt.get("markers"))
-        #Circle().point_at_angle(2*PI + 0.1)
+        #self.play(Create(Sector().set_fill(color=BLACK)))
         self.wait()
 
     def play_mul_illu(self, m, n, k, l):
         f1dt= self.get_frac_illustration(m, n, range(0,m),sec_per_group=1)
+        f1_rep = f1dt.get("parts")
+        f1_tex = f1dt.get("symbols")[0]
+        f1_vgp = f1dt.get("group")
+
         f2dt= self.get_frac_illustration(m*l, n*l, range(0,m*l), sec_per_group=m)
-        f2dt.get("group").move_to(f1dt.get("group"))
-        f1dt.get("vg_symbols").next_to(f1dt.get("group"), buff=0.5, direction=DOWN)
+        f2_rep = f2dt.get("parts")
+
+        f2dt.get("group").move_to(f1_vgp)
+        f1dt.get("vg_symbols").next_to(f1_vgp, buff=0.5, direction=DOWN)
         
         tex1_f1 = MathTex(f"{{{k}}}", r'\over', f"{{{l}}}", font_size=34, color=TEX_COLOR1)
         tex2_x = MathTex(r'\times', font_size=34, color=TEX_COLOR1) 
@@ -44,84 +45,88 @@ class FracMulIntro1(Scene):
                     f"{{{l}}} equal parts.", arg_separator=" ", font_size=34, color=TEX_COLOR1)
 
         self.play(Write(VGroup(tex1_f1, tex2_x, tex3_f2, tex4, tex5, tex6).arrange().shift(UP*3)))
-                    
-
-        
-        self.play( 
-            FadeIn(
-                *f1dt.get("parts"),
-                f1dt.get("symbols")[0].next_to(f1dt.get("group"), direction=LEFT, buff=2)
-            ))
-
-        self.play(FadeOut(f1dt.get("symbols")[0]))
+                            
+        self.play(FadeIn(*f1_rep, f1_tex.next_to(f1_vgp, direction=LEFT, buff=2)))
+       
+        ##### divide n/n into n*l/n*l
+        self.play(FadeOut(f1_tex))
         for i in range(0,n):
-            self.play(FadeIn(*f2dt.get("parts")[i*l: (i+1)*l ]), run_time=0.1)
+            self.play(FadeIn(*f2_rep[i*l: (i+1)*l ]), run_time=0.1)
             self.wait()
 
-        self.remove(*f1dt.get("parts"))
+        self.remove(*f1_rep)
 
         ###
-        # Each part of 3/3 is divided into 7 equal parts
+        # emphasize each parts of n/n,  each having l parts
 
-        self.play(VGroup(*f2dt.get("parts")[0:l]).animate().shift(f1dt.get("vectors")[0].get_unit_vector()*0.05)
-                    ,VGroup(*f2dt.get("parts")[l:2*l]).animate().shift(f1dt.get("vectors")[1].get_unit_vector()*0.05)
-                    ,VGroup(*f2dt.get("parts")[2*l:3*l]).animate().shift(f1dt.get("vectors")[2].get_unit_vector()*0.1))
-
-        self.play(VGroup(*f2dt.get("parts")[0:l]).animate().shift(-f1dt.get("vectors")[0].get_unit_vector()*0.05)
-                    ,VGroup(*f2dt.get("parts")[l:2*l]).animate().shift(-f1dt.get("vectors")[1].get_unit_vector()*0.05)
-                    ,VGroup(*f2dt.get("parts")[2*l:3*l]).animate().shift(-f1dt.get("vectors")[2].get_unit_vector()*0.1))
+        # group l parts in each of n parts (eg for 5/7 x 2/3, each parts of 3/3 divided into 7 parts)
+        n_gp = [VGroup(*f2_rep[i*l:i*l+l]) for i in range(0, n)]
+        self.play(AnimationGroup(
+            *[g.animate().shift(v.get_unit_vector()*0.05) for g, v in zip(n_gp, f1dt.get("vectors"))]
+        ))
+        self.wait()
+        self.play(AnimationGroup(
+            *[g.animate().shift(-v.get_unit_vector()*0.05) for g, v in zip(n_gp, f1dt.get("vectors"))]
+        ))
 
         ###
-        # For 2/3, there are 14 equal parts  
-        self.play(FadeIn(*f2dt.get("sec_lbls")[0:2*l]))
+        # For m/n, there are m*l equal parts  
+        self.play(FadeIn(*f2dt.get("sec_lbls")[0:m*l]))
         self.wait(3)
 
-        sec_even = f2dt.get("parts")[0::2][0:l]
-        sec_odd = f2dt.get("parts")[1::2][0:l]
-        shift_val = [0.1, 0.15]*n*l
-        v = f2dt.get("vectors_gp")
-
-        self.play(AnimationGroup(
-                    *[s.animate().shift(v.get_unit_vector()*d) for s,v,d in zip(sec_even, v, shift_val)]
-                ),
-                AnimationGroup(
-                    *[s.animate().shift(v.get_unit_vector()*d) for s,v,d in zip(sec_odd, v, shift_val)]
-                ),
-            )
-
         ###
-        # 14 equals parts of 2/3 into 7 equals parts and emphasize 7 equal parts of 2/3
+        # emphasize l equal parts of m/n by moving outward from the center
+        # (m*l parts are l equal group, each group having m parts)  
+        shift_val = [0.1] * n*l
+        v_gp = f2dt.get("vectors_gp")
+        l_gp = [VGroup(*f2_rep[i*m:i*m+m]) for i in range(0,l)]
+        self.play(AnimationGroup(
+            *[g.animate().shift(v.get_unit_vector()*sv) for g, v, sv in zip(l_gp, v_gp, shift_val)]
+        ))
+        
         self.play(FadeIn(*f2dt.get("gp_lbls")[0:l], shift=RIGHT, run_time=1.5),
-                    FadeOut(*f2dt.get("sec_lbls")[0:2*l], shift=LEFT, run_time=0.75))
+                    FadeOut(*f2dt.get("sec_lbls")[0:m*l], shift=LEFT, run_time=1))
         self.wait(2)
 
         ###
-        # emphasize 5 of 7 parts of 2/3 more
-        self.play(AnimationGroup(
-                    *[s.animate().shift(v.get_unit_vector()*d) for s,v,d in zip(sec_even[0:5], v, shift_val)]
-                ),
-                AnimationGroup(
-                    *[s.animate().shift(v.get_unit_vector()*d) for s,v,d in zip(sec_odd[0:5], v, shift_val)]
-                ),
-                AnimationGroup(*[Flash(l, scale_value=1.7, color=IND_COLOR, line_stroke_width=IND_LINE_W) for l in f2dt.get("gp_lbls")[0:5]])
-            )
-        self.play(AnimationGroup(*[Wiggle(l, scale_value=1.7) for l in f2dt.get("gp_lbls")[0:5]]), run_time=2)
+        # emphasize only k parts if k < l
+        # emphasize up to l parts first if k > l
+        up_to = l if k > l else k
+        self.play(
+            FadeIn(*l_gp[0:k], lag_ratio=1), 
+            AnimationGroup(
+                *[Flash(l, scale_value=1.7, color=IND_COLOR, line_stroke_width=IND_LINE_W) 
+                    for l in f2dt.get("gp_lbls")[0:up_to]])
+        )
 
         ###
-        # De-emphasize 6th and 7th parts of 2/3
-        de_ems = [s.set_fill(color=G_FIG_FILL_1, opacity=0.4) for s in f2dt.get("parts")[10:14]]
-
-        self.play(AnimationGroup(
-                    *[s.animate().shift(-v.get_unit_vector()*d) for s,v,d in zip(sec_even[5:7], v[5:7], shift_val[5:7])]
-                ),
+        # emphasize remaining parts whe k > l
+        if k > l:
+            l_gp1 = [VGroup(*f2_rep[i*m:i*m+m]) for i in range(l,k)]
+            self.play(AnimationGroup(
+                *[g.animate().shift(v.get_unit_vector()*sv) for g, v, sv in zip(l_gp1, v_gp[l:k], shift_val)]
+            ), run_time=0.5)
+            self.play(AnimationGroup(
+                        *[Transform(s, s.copy().set_fill(G_FIG_FILL_1, opacity=1)) for s in f2_rep[m*l:k*l]]
+                ), 
+                FadeIn(*f2dt.get("gp_lbls")[l:k], lag_ratio=1), 
                 AnimationGroup(
-                    *[s.animate().shift(-v.get_unit_vector()*d) for s,v,d in zip(sec_odd[5:7], v[5:7], shift_val[5:7])]
-                ),
-                FadeOut(*f2dt.get("gp_lbls")[k:7])
-            )
+                    *[Flash(l, scale_value=1.7, color=IND_COLOR, line_stroke_width=IND_LINE_W) 
+                        for l in f2dt.get("gp_lbls")[l:k]]))
 
-        self.play(FadeOut(*f2dt.get("gp_lbls")[0:k]))
+        ###
+        # De-emphasize remaining if k < l
+        if k < l:
+            l_gp2 = [VGroup(*f2_rep[i*m:i*m+m]) for i in range(k,l)]
+            self.play(AnimationGroup(
+                *[g.animate().shift(-v.get_unit_vector()*sv) for g, v, sv in zip(l_gp2, v_gp[k:l], shift_val)]
+            ), run_time=0.5)
+            self.play(AnimationGroup(
+                        *[Transform(s, s.copy().set_fill(color=G_FIG_FILL_1,opacity=0.2)) for s in f2_rep[k*m:m*l]]
+                ), 
+                FadeOut(*f2dt.get("gp_lbls")[k:l], lag_ratio=1))
 
+        self.play(FadeOut(*f2dt.get("gp_lbls")[0:k], shift=LEFT))
         exp = MathTex(f"{{{k}}}", r'\times', f"{{{m}}}", r'\over', f"{{{l}}}", r'\times', f"{{{n}}}", color=TEX_COLOR1)
         equal = MathTex('=', color=TEX_COLOR1)
         exp2 = MathTex(f"{{{int(k*m)}}}", r'\over', f"{{{int(l*n)}}}", color=TEX_COLOR1)
@@ -135,7 +140,7 @@ class FracMulIntro1(Scene):
         self.play(FadeIn(exp2[1], shift=RIGHT),Write(exp2[2]))
         
 
-        self.wait(10)
+        self.wait(3)
         
 
 
