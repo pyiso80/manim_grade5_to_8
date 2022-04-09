@@ -1,15 +1,16 @@
 from manim import *
 import numpy as np
 
-config.background_color="#FFFBEF"
-BACKGROUND = "#FFFBEF"
-G_FIG_FILL_COLOR1 = TEAL
-G_FIG_STROKE_COLOR1= "#5E5E5E" #Main
+config.background_color="#FDF6E3" # OLD PAPER: "#E0C9A6", PAPER WHITE: #F9FBFF, moleskin: FFF8DC
+BACKGROUND = "#FDF6E3"
+G_FIG_FILL_COLOR1 = "#EE204D" # LIGHT CORAL: "#F08080" #TEAL LEAD: #05EDFF #PINE: #6EB183
+G_FIG_STROKE_COLOR1= "#0B0B0B" #Main, # TORONTO: #526B9B, 
 G_FIG_STROKE_COLOR2= "#A9A9A9" #Dimmed
 G_FIG_STROKE_W1=1.5
 IND_COLOR1 = "#FF2600"
-IND_STROKE_W1 = 1.5
+IND_STROKE_W1 = 1.25
 TEX_COLOR1 = "#212121"
+BR_COLOR1 = "#424242"
 
 SECTORS = "sectors"
 SEC_LBLS = "sec_lbls"
@@ -217,9 +218,9 @@ class FracMulIntro1(Scene):
                 start_angle=(PI/2 + i * arc_len))
             for i in range(0, n)]    
         parts = [p.copy().set_fill(BACKGROUND).set_stroke(color=G_FIG_STROKE_COLOR1, width=1.5, 
-            opacity=1).set_z_index(0) for p in all_parts]
+            opacity=1).set_z_index(1) for p in all_parts]
         for i in which_parts:
-            parts[i].set_fill(G_FIG_FILL_COLOR1).set_stroke(G_FIG_STROKE_COLOR1).set_z_index(1) 
+            parts[i].set_fill(G_FIG_FILL_COLOR1).set_stroke(G_FIG_STROKE_COLOR1).set_z_index(2) 
 
         VGroup(*all_parts).move_to(ORIGIN)
         VGroup(*parts).move_to(ORIGIN)
